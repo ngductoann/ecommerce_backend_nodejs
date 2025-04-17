@@ -12,6 +12,10 @@ const keyTokenSchema = new Schema(
       required: true,
       ref: "Shop", // Ensure this matches the Shop model
     },
+    privateKey: {
+      type: String, // Ensure privateKey is stored as a string
+      required: true,
+    },
     publicKey: {
       type: String, // Ensure publicKey is stored as a string
       required: true,
