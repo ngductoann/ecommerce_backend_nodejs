@@ -31,8 +31,8 @@ app.use(express.urlencoded({ extended: true }));
 // init database
 // require("./dbs/init.mongodb.lv0.js");
 require("./dbs/init.mongodb");
-const { checkOverLoad } = require("./helper/check.connect");
-checkOverLoad();
+// const { checkOverLoad } = require("./helper/check.connect");
+// checkOverLoad();
 
 // init routes
 app.use("/", require("./routers/index"));
