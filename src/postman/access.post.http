@@ -8,6 +8,6 @@ x-api-key: {{api_key}}
 
 {
 	"name": "test",
-	"email": "test@gmail.com",
+	"email": "test02@gmail.com",
 	"password": "test123"
 }
