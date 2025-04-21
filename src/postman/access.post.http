@@ -1,5 +1,5 @@
 @url_dev = http://localhost:3052/v1/api
-@api_key = e719bfcc60e28bb5b073f8ff6d1cd9a67ade787a79d3a8869ffd38c54e5247bfac7c6a0f7b11fe254aa9039b6a2213eb681024ab639d88932237f99304608c25
+@api_key = 1ca13b3459e7a9b794f508a64985894d1b8100746dda7b9ecf77e142e20bf6e188b474a8b02e8e03b79a9a8f24e6a54f5ceffaa4d5c571c52473126818189425
 
 ### signup
 POST {{url_dev}}/shop/signup
@@ -8,6 +8,16 @@ x-api-key: {{api_key}}
 
 {
 	"name": "test",
-	"email": "test02@gmail.com",
+	"email": "test@gmail.com",
+	"password": "test123"
+}
+
+### login
+POST {{url_dev}}/shop/login
+Content-Type: application/json
+x-api-key: {{api_key}}
+
+{
+	"email": "test@gmail.com",
 	"password": "test123"
 }

@@ -6,7 +6,11 @@ const crypto = require("node:crypto");
 const KeyTokenService = require("./keyToken.service");
 const createTokenPair = require("../auth/authUtils");
 const { getInfoData } = require("../utils");
-const { BadRequestError } = require("../core/error.response");
+const { BadRequestError, AuthFailureError } = require("../core/error.response");
+const { StatusCodes } = require("../utils/httpStatusCode");
+
+// service
+const { findByEmail } = require("./shop.service");
 
 const ROLES_SHOP = {
   SHOP: "SHOP",
@@ -16,6 +20,81 @@ const ROLES_SHOP = {
 };
 
 class AccessService {
+  /**
+   * 1 - check emails in dbs
+   * 2 - match password
+   * 3 - create Access Token and Refresh Token and save
+   * 4 - generate tokens
+   * 5 - get data return login
+   * @param {string} email - The email of the shop
+   * @param {string} password - The password of the shop
+   * @param {string} refreshToken - The refresh token of the shop
+   * @return {Promise<{code: number, metadata: {tokens: *, shop: *}}>}
+   * @throws {BadRequestError} - If the shop not found or password is incorrect
+   * @throws {AuthFailureError} - If the password is incorrect
+   */
+  static login = async ({ email, password, refreshToken = null }) => {
+    console.log(`[P]::login:: `, { email, password, refreshToken });
+    // 1.
+    const foundShop = await findByEmail(email);
+    if (!foundShop) {
+      throw new BadRequestError("Error: Shop not found");
+    }
+
+    // 2.
+    const match = bcrypt.compare(password, foundShop.password);
+    if (!match) {
+      throw new AuthFailureError("Error: Password is not correct");
+    }
+
+    // 3.
+    // created private key and public key
+    const privateKey = crypto.randomBytes(64).toString("hex");
+    const publicKey = crypto.randomBytes(64).toString("hex");
+
+    const { _id: userId } = foundShop;
+
+    // 4.
+    const tokens = await createTokenPair(
+      { userId, email },
+      publicKey,
+      privateKey
+    );
+
+    await KeyTokenService.createKeyToken({
+      userId,
+      publicKey,
+      privateKey,
+      refreshToken: tokens.refreshToken,
+    });
+
+    // 5.
+    return {
+      code: StatusCodes.CREATED,
+      metadata: {
+        shop: getInfoData({
+          fields: ["_id", "name", "email"],
+          object: foundShop,
+        }),
+        tokens,
+      },
+    };
+  };
+
+  /**
+   * Sign up a new shop
+   * 1 - check if the email already exists
+   * 2 - create a new shop
+   * 3 - create a new key token
+   * 4 - save public key to the database
+   * 5 - create a new tokens
+   * 6 - return the tokens and shop info
+   * @param {string} name - The name of the shop
+   * @param {string} email - The email of the shop
+   * @param {string} password - The password of the shop
+   * @return {Promise<{code: number, metadata: {tokens: *, shop: *}}>}
+   * @throws {BadRequestError} - If the shop already exists or if there is an error creating the shop or key token
+   */
   static signUp = async ({ name, email, password }) => {
     // try {
     // Step 1: create a new shop
@@ -62,8 +141,10 @@ class AccessService {
     console.log({ privateKey, publicKey });
 
     // Step 4: save public key to the database
+    const { _id: userId } = newShop;
+
     const keyStore = await KeyTokenService.createKeyToken({
-      userId: newShop._id,
+      userId,
       publicKey,
       privateKey,
     });
@@ -80,7 +161,7 @@ class AccessService {
 
     // Step 5: create a new tokens
     const tokens = await createTokenPair(
-      { userId: newShop._id, email },
+      { userId, email },
       publicKey,
       privateKey
     );
