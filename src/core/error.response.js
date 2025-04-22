@@ -1,5 +1,5 @@
 "use strict";
-const { StatusCodes, ReasonsPhrases } = require("../utils/statusCodes");
+const { StatusCodes, ReasonsPhrases } = require("../utils/httpStatusCode");
 
 class ErrorResponse extends Error {
   constructor(message, status) {
@@ -35,8 +35,18 @@ class AuthFailureError extends ErrorResponse {
   }
 }
 
+class NotFoundError extends ErrorResponse {
+  constructor(
+    message = ReasonsPhrases.NOT_FOUND,
+    statusCode = StatusCodes.NOT_FOUND
+  ) {
+    super(message, statusCode);
+  }
+}
+
 module.exports = {
   ConflictRequestError,
   BadRequestError,
   AuthFailureError,
+  NotFoundError,
 };
