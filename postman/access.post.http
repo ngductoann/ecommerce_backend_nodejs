@@ -1,0 +1,47 @@
+@url_dev = http://localhost:3052/v1/api
+@api_key = 1ca13b3459e7a9b794f508a64985894d1b8100746dda7b9ecf77e142e20bf6e188b474a8b02e8e03b79a9a8f24e6a54f5ceffaa4d5c571c52473126818189425
+@authorization = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODA5YjUxODM0YjA0MzZlZjY1MTk1NjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwiaWF0IjoxNzQ1NDgzNjY3LCJleHAiOjE3NDU2NTY0Njd9.a0zIlhBvt3wzgTMuGCK4PZ1UBngLxyAeovzp3PtEQ68
+@client_id = 6809b51834b0436ef6519561
+
+### signup
+POST {{url_dev}}/shop/signup
+Application: application/json
+Content-Type: application/json
+x-api-key: {{api_key}}
+
+{
+	"name": "test",
+	"email": "test@gmail.com",
+	"password": "test123"
+}
+
+### login
+POST {{url_dev}}/shop/login
+Application: application/json
+Content-Type: application/json
+x-api-key: {{api_key}}
+
+{
+	"email": "test@gmail.com",
+	"password": "test123"
+}
+
+### logout
+POST {{url_dev}}/shop/logout
+Application: application/json
+Content-Type: application/json
+x-api-key: {{api_key}}
+x-client-id: {{client_id}}
+authorization: {{authorization}}
+
+### handler refresh token
+POST {{url_dev}}/shop/handlerRefreshToken
+Application: application/json
+Content-Type: application/json
+x-api-key: {{api_key}}
+x-client-id: {{client_id}}
+authorization: {{authorization}}
+
+{
+   "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODA5YjUxODM0YjA0MzZlZjY1MTk1NjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwiaWF0IjoxNzQ1NDgzNjY3LCJleHAiOjE3NDYwODg0Njd9.muB_gfmJW1eCo41qADrtfD7rUjf9kcwXwMJJ-yYSefA"
+}

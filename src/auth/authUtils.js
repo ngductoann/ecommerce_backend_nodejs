@@ -21,13 +21,13 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
       expiresIn: "7 days",
     });
 
-    JWT.verify(accessToken, publicKey, (err, decoded) => {
-      if (err) {
-        console.error("verification failed::", err);
-      } else {
-        console.log("verified decoded::", decoded);
-      }
-    });
+    // JWT.verify(accessToken, publicKey, (err, decoded) => {
+    //   if (err) {
+    //     console.error("verification failed::", err);
+    //   } else {
+    //     console.log("verified decoded::", decoded);
+    //   }
+    // });
 
     return { accessToken, refreshToken };
   } catch (error) {
@@ -69,4 +69,8 @@ const authentication = asyncHandler(async (req, res, next) => {
   }
 });
 
-module.exports = { createTokenPair, authentication };
+const verifyJWT = async (token, keySecret) => {
+  return await JWT.verify(token, keySecret);
+};
+
+module.exports = { createTokenPair, authentication, verifyJWT };
