@@ -4,10 +4,10 @@ const express = require("express");
 const productController = require("../../controllers/product.controller");
 const routers = express.Router();
 const asyncHandler = require("../../helper/asyncHandler");
-const { authentication } = require("../../auth/authUtils");
+const { authenticationV2 } = require("../../auth/authUtils");
 
 // authentication
-routers.use(authentication);
+routers.use(authenticationV2);
 
 // create product
 routers.post("", asyncHandler(productController.createProduct));

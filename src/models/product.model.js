@@ -17,7 +17,11 @@ const productSchema = new Schema(
       required: true,
       enum: ["Electronics", "Clothing", "Furniture"],
     },
-    product_shop: String,
+    product_shop: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Shop",
+    },
     product_attributes: { type: Schema.Types.Mixed, required: true },
   },
   {
@@ -37,7 +41,7 @@ const clothingSchema = new Schema(
     material: String,
   },
   {
-    collection: "Clothes",
+    collection: COLLECTION_NAME_CLOTHING,
     timestamps: true,
   },
 );

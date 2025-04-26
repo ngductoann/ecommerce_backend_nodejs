@@ -33,13 +33,13 @@ class KeyTokenService {
     const tokens = await keyTokenSchema.findOneAndUpdate(
       filter,
       update,
-      options
+      options,
     );
     return tokens ? tokens : null;
   };
 
   static findByUserId = async (userId) => {
-    return await keyTokenSchema.findOne({ user: userId }).lean();
+    return await keyTokenSchema.findOne({ user: userId });
   };
 
   static removeKeyById = async (id) => {

@@ -9,6 +9,7 @@ const HEADER = {
   API_KEY: "x-api-key",
   USER_ID: "x-client-id",
   AUTHORIZATION: "authorization",
+  REFRESH_TOKEN: "x-rtoken-id",
 };
 
 const createTokenPair = async (payload, publicKey, privateKey) => {
@@ -62,6 +63,49 @@ const authentication = asyncHandler(async (req, res, next) => {
     if (userId !== decodedUser.userId)
       throw new AuthFailureError("Invalid UserId");
     req.keyStore = keyStore;
+    req.user = decodedUser; // {userId, email}
+
+    return next();
+  } catch (error) {
+    throw error;
+  }
+});
+
+const authenticationV2 = asyncHandler(async (req, res, next) => {
+  const userId = req.headers[HEADER.USER_ID];
+  if (!userId) throw new AuthFailureError("Invalid Request");
+
+  const keyStore = await KeyTokenService.findByUserId(userId);
+  if (!keyStore) throw new NotFoundError("Not Found KeyStore");
+
+  // additional check for refresh token
+  // accessToken is short-lived, refreshToken is long-lived
+  // if refreshToken is provided, verify it first
+  if (req.headers[HEADER.REFRESH_TOKEN]) {
+    try {
+      const refreshToken = req.headers[HEADER.REFRESH_TOKEN];
+      const decodedUser = JWT.verify(refreshToken, keyStore.privateKey);
+      if (userId !== decodedUser.userId)
+        throw new AuthFailureError("Invalid UserId");
+      req.keyStore = keyStore;
+      req.user = decodedUser; // {userId, email}
+      req.refreshToken = refreshToken;
+
+      return next();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  const accessToken = req.headers[HEADER.AUTHORIZATION];
+  if (!accessToken) throw new AuthFailureError("Invalid Request");
+
+  try {
+    const decodedUser = JWT.verify(accessToken, keyStore.publicKey);
+    if (userId !== decodedUser.userId)
+      throw new AuthFailureError("Invalid UserId");
+    req.keyStore = keyStore;
+    req.user = decodedUser; // {userId, email}
 
     return next();
   } catch (error) {
@@ -73,4 +117,9 @@ const verifyJWT = async (token, keySecret) => {
   return await JWT.verify(token, keySecret);
 };
 
-module.exports = { createTokenPair, authentication, verifyJWT };
+module.exports = {
+  createTokenPair,
+  authentication,
+  authenticationV2,
+  verifyJWT,
+};
