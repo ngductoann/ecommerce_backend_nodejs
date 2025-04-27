@@ -7,6 +7,12 @@ const {
   furniture,
 } = require("../models/product.model");
 const { BadRequestError } = require("../core/error.response");
+const {
+  findAllDraftsForShop,
+  publishProductByShop,
+  unPublishProductByShop,
+  searchProductByUser,
+} = require("../models/repositories/product.repo");
 
 // define factory class to crate product
 class ProductFactory {
@@ -37,6 +43,32 @@ class ProductFactory {
     //     throw new BadRequestError(`Invalid product type ${type}`);
     // }
   }
+
+  // PUT
+  static async publishProductByShop({ product_shop, product_id }) {
+    return await publishProductByShop({ product_shop, product_id });
+  }
+
+  static async unPublishProductByShop({ product_shop, product_id }) {
+    return await unPublishProductByShop({ product_shop, product_id });
+  }
+  // END PUT
+
+  // QUERY //
+  static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }) {
+    const query = { product_shop, isDraft: true };
+    return await findAllDraftsForShop({ query, limit, skip });
+  }
+
+  static async findAllPublishForShop({ product_shop, limit = 50, skip = 0 }) {
+    const query = { product_shop, isPublished: true };
+    return await findAllDraftsForShop({ query, limit, skip });
+  }
+
+  static async getListSearchProduct({ keySearch }) {
+    return await searchProductByUser({ keySearch });
+  }
+  // END QUERY //
 }
 
 // define base product class
@@ -117,7 +149,7 @@ class Electronic extends Product {
 }
 
 // define sub-class for different product types Electronic
-class furniture extends Product {
+class Furniture extends Product {
   async createProduct() {
     const newFuniture = await furniture.create({
       ...this.product_attributes,
@@ -136,6 +168,6 @@ class furniture extends Product {
 // register product type
 ProductFactory.registerProductType("Clothing", Clothing);
 ProductFactory.registerProductType("Electronics", Electronic);
-ProductFactory.registerProductType("Furniture", furniture);
+ProductFactory.registerProductType("Furniture", Furniture);
 
 module.exports = ProductFactory;
