@@ -31,7 +31,7 @@ const productSchema = new Schema(
       default: 4.5,
       min: [1, "Rating must be above 1.0"],
       max: [5, "Rating must be below 5.0"],
-      set: (val) => Math.round((val * 10) / 10), // round to 1 decimal place
+      set: (val) => Math.round(val * 10) / 10, // round to 1 decimal place
     },
     product_variations: { type: Array, default: [] },
     isDraft: { type: Boolean, default: true, index: true, select: false },
