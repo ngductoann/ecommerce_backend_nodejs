@@ -49,6 +49,14 @@ productSchema.pre("save", function (next) {
   next();
 });
 
+productSchema.pre("findOneAndUpdate", function (next) {
+  const update = this.getUpdate();
+  if (update.product_name) {
+    update.product_slug = slugify(update.product_name, { lower: true });
+  }
+  next();
+});
+
 // create index for search
 productSchema.index({ product_name: "text", product_description: "text" });
 

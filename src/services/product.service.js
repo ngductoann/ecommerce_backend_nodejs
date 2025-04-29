@@ -14,7 +14,12 @@ const {
   searchProductByUser,
   findAllProducts,
   findProduct,
+  updateProductById,
 } = require("../models/repositories/product.repo");
+const {
+  removeUndefinedObject,
+  updateNestedObjectParser,
+} = require("../utils/index");
 
 // define factory class to crate product
 class ProductFactory {
@@ -46,7 +51,12 @@ class ProductFactory {
     // }
   }
 
-  static async updateProduct() {}
+  static async updateProduct(type, productId, payload) {
+    const productClass = ProductFactory.productRegistry[type];
+    if (!productClass)
+      throw new BadRequestError(`Invalid product type ${type}`);
+    return new productClass(payload).updateProduct(productId);
+  }
 
   // PUT
   static async publishProductByShop({ product_shop, product_id }) {
@@ -135,6 +145,10 @@ class Product {
   async createProduct(product_id) {
     return await product.create({ ...this, _id: product_id });
   }
+
+  async updateProduct(productId, bodyUpdate) {
+    return updateProductById({ productId, bodyUpdate, model: product });
+  }
 }
 
 // define sub-class for different product types Clothing
@@ -151,6 +165,35 @@ class Clothing extends Product {
     if (!newProduct) throw new BadRequestError("Failed to create product");
 
     return newProduct;
+  }
+  async updateProduct(productId) {
+    /*
+    check body request is valid
+    {
+      a: underfined,
+      b: null
+    }
+    */
+    // 1. remove attr has null or underfined
+    // console.log("objectParams::", this);
+    const objectParams = removeUndefinedObject(this);
+    // console.log("objectParams after remove::", objectParams);
+    // 2. check update where (parent or child)
+    if (objectParams.product_attributes) {
+      // update child
+      await updateProductById({
+        productId,
+        bodyUpdate: updateNestedObjectParser(objectParams.product_attributes),
+        model: clothing,
+      });
+    }
+
+    // update parent
+    const updatedProduct = await super.updateProduct(
+      productId,
+      updateNestedObjectParser(objectParams),
+    );
+    return updatedProduct;
   }
 }
 
