@@ -6,7 +6,11 @@ const {
   electronic,
   furniture,
 } = require("../../models/product.model");
-const { getSelectData, unGetSelectData } = require("../../utils/index");
+const {
+  getSelectData,
+  unGetSelectData,
+  convertToObjectIdMongoDB,
+} = require("../../utils/index");
 const { Types } = require("mongoose");
 
 const findAllDraftsForShop = async ({ query, limit, skip }) => {
@@ -102,6 +106,10 @@ const queryProduct = async ({ query, limit, skip }) => {
     .exec(); // exec() to return a promise
 };
 
+const getProductById = async (productId) => {
+  return await product.findOne({ _id: convertToObjectIdMongoDB(productId) });
+};
+
 module.exports = {
   findAllDraftsForShop,
   findAllPublishForShop,
@@ -111,4 +119,5 @@ module.exports = {
   findAllProducts,
   findProduct,
   updateProductById,
+  getProductById,
 };
