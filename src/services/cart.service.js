@@ -30,10 +30,10 @@ class CartService {
   static async updateUserCartQuantity({ userId, product }) {
     const { productId, quantity } = product;
     const query = {
-        cart_userId: userId,
-        "cart_products.productId": productId,
-        cart_state: "active",
-      },
+      cart_userId: userId,
+      "cart_products.productId": productId,
+      cart_state: "active",
+    },
       updateSet = {
         $inc: {
           "cart_products.quantity": quantity,

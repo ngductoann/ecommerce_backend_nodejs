@@ -29,16 +29,15 @@ class AccessService {
    */
   static handlerRefreshToken = async (refreshToken) => {
     // check if refresh token is used
-    const foundToken = await KeyTokenService.findByRefreshTokenUsed(
-      refreshToken
-    );
+    const foundToken =
+      await KeyTokenService.findByRefreshTokenUsed(refreshToken);
 
     // if token is used
     if (foundToken) {
       // decode check who are you
       const { userId, email } = await verifyJWT(
         refreshToken,
-        foundToken.privateKey
+        foundToken.privateKey,
       );
       console.log(`Decode-1::`, { userId, email });
 
@@ -60,7 +59,7 @@ class AccessService {
     // verifyToken
     const { userId, email } = await verifyJWT(
       refreshToken,
-      holderToken.privateKey
+      holderToken.privateKey,
     );
     // console.log(`Decode-2::`, { userId, email });
     // check UserId
@@ -71,7 +70,7 @@ class AccessService {
     const tokens = await createTokenPair(
       { userId, email },
       holderToken.publicKey,
-      holderToken.privateKey
+      holderToken.privateKey,
     );
 
     // update token
@@ -112,7 +111,7 @@ class AccessService {
     const tokens = await createTokenPair(
       { userId, email },
       keyStore.publicKey,
-      keyStore.privateKey
+      keyStore.privateKey,
     );
 
     await keyStore.updateOne({
@@ -177,7 +176,7 @@ class AccessService {
     const tokens = await createTokenPair(
       { userId, email },
       publicKey,
-      privateKey
+      privateKey,
     );
 
     await KeyTokenService.createKeyToken({
@@ -282,7 +281,7 @@ class AccessService {
     const tokens = await createTokenPair(
       { userId, email },
       publicKey,
-      privateKey
+      privateKey,
     );
 
     console.log(`Create Token Success::`, tokens);

@@ -14,7 +14,7 @@ const findByEmail = async (
     name: 1,
     status: 1,
     roles: 1,
-  }
+  },
 ) => {
   console.log(`[P]::findByEmail:: `, { email, select });
   return await shopModel.findOne({ email }).select(select).lean();
